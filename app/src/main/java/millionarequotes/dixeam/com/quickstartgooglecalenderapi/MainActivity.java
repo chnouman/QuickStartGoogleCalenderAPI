@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -35,8 +36,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.CalendarScopes;
+ import com.google.api.services.calendar.CalendarScopes;
 
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import com.google.api.services.calendar.Calendar;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -60,6 +61,7 @@ public class MainActivity extends Activity
     GoogleAccountCredential mCredential;
     private TextView mOutputText;
     private Button mCallApiButton;
+    private Button mAddNewCalender;
     private Button mAddEventsButton;
     ProgressDialog mProgress;
 
@@ -86,6 +88,7 @@ public class MainActivity extends Activity
 
         mCallApiButton = (Button) findViewById(R.id.get_events);
         mAddEventsButton = (Button) findViewById(R.id.add_event);
+        mAddNewCalender = (Button) findViewById(R.id.add_new_calender);
         mCallApiButton.setText(BUTTON_TEXT);
         mCallApiButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +114,23 @@ public class MainActivity extends Activity
             }
         });
 
+        mAddNewCalender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mCallApiButton.setEnabled(false);
+                mAddEventsButton.setEnabled(false);
+                mAddNewCalender.setEnabled(false);
+                //new MakeNewCalender(mCredential).execute();
+                // mOutputText.setText("");
+                // getResultsFromApi();
+                mCallApiButton.setEnabled(true);
+                mAddEventsButton.setEnabled(true);
+                mAddNewCalender.setEnabled(true);
+
+
+            }
+        });
 
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
@@ -375,8 +395,9 @@ public class MainActivity extends Activity
                 List<CalendarListEntry> items = calendarList.getItems();
 
                 for (CalendarListEntry calendarListEntry : items) {
-                    System.out.println(calendarListEntry.getSummary());
-                    Log.wtf("CalenderList", "showCalenderList: "+calendarListEntry.getSummary() );
+                    //System.out.println(calendarListEntry.getSummary());
+                    Log.wtf("CalenderList", "showCalenderList: to string "+calendarListEntry.toString() );
+                    Log.wtf("CalenderList", "showCalenderList: id  = = == ="+calendarListEntry.getId() );
                 }
                 pageToken = calendarList.getNextPageToken();
             } while (pageToken != null);
@@ -409,10 +430,11 @@ public class MainActivity extends Activity
          */
         private List<String> getDataFromApi() throws IOException {
             // List the next 10 events from the primary calendar.
+           //CreateCalendar();
             DateTime now = new DateTime(System.currentTimeMillis());
-
+            //makeCale();
             List<String> eventStrings = new ArrayList<String>();
-            Events events = mService.events().list("This Class C")
+            Events events = mService.events().list("primary")
                     .setMaxResults(1000)
                     /*.setTimeMin(now)*/
                     .setOrderBy("startTime")
@@ -436,6 +458,40 @@ public class MainActivity extends Activity
         }
 
 
+        public void makeCale(){
+            // Create a new calendar list entry
+            CalendarListEntry calendarListEntry = new CalendarListEntry();
+            /*classroom111041963119631196123@group.calendar.google.com*/
+            calendarListEntry.setId("primary");
+
+// Insert the new calendar list entry
+            CalendarListEntry createdCalendarListEntry = null;
+            try {
+                createdCalendarListEntry = mService.calendarList().insert(calendarListEntry).execute();
+                System.out.println("Valued "+createdCalendarListEntry.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        public void CreateCalendar()
+        {
+
+            try {
+        // Create a new calendar
+            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+            calendar.setSummary("StarlingCalender");
+            calendar.setTimeZone("America/Los_Angeles");
+
+        // Insert the new calendar
+                com.google.api.services.calendar.model.Calendar createdCalendar = null;
+                createdCalendar = mService.calendars().insert(calendar).execute();
+                System.out.println(createdCalendar.getId());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
@@ -521,7 +577,7 @@ public class MainActivity extends Activity
             /**starting code for adding event */
 
             Event event = new Event()
-                    .setSummary("Starling I/O Meeting 2017")
+                    .setSummary("Test Starling")
                     .setLocation("office # 26, Rehman Trade Center, Sargodha Pakistan")
                     .setDescription("Starling team is going to organize a Meeting to discuss the Starling Architecture");
             DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
@@ -530,7 +586,7 @@ public class MainActivity extends Activity
                     .setTimeZone("America/Los_Angeles");
             event.setStart(start);
 
-            DateTime endDateTime = new DateTime("2015-05-28T17:00:00-07:00");
+            DateTime endDateTime = new DateTime("2017-05-28T17:00:00-07:00");
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime)
                     .setTimeZone("America/Los_Angeles");
@@ -540,10 +596,11 @@ public class MainActivity extends Activity
                     new EventAttendee().setEmail("chnouman200@gmail.com"),
                     new EventAttendee().setEmail("dixeamoffice@gmail.com"),
                     new EventAttendee().setEmail("link2faiz@gmail.com"),
+                    new EventAttendee().setEmail("fzn.ullah@gmail.com"),
             };
             event.setAttendees(Arrays.asList(attendees));
 
-            event = mService.events().insert("primary", event).execute();
+            event = mService.events().insert("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com", event).execute();
 
             wtf("Event created: %s\n", event.getHtmlLink());
 
@@ -594,4 +651,8 @@ public class MainActivity extends Activity
             }
         }
     }
-}
+
+
+
+
+ }
