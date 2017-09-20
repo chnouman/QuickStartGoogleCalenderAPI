@@ -36,8 +36,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.ExponentialBackOff;
- import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.CalendarScopes;
 
+import com.google.api.services.calendar.model.AclRule;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import com.google.api.services.calendar.Calendar;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -72,18 +74,17 @@ public class MainActivity extends Activity
 
     private static final String BUTTON_TEXT = "Call Google Calendar API";
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY, "https://www.googleapis.com/auth/calendar"};
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY, "https://www.googleapis.com/auth/calendar"};
 
     /**
      * Create the main activity.
+     *
      * @param savedInstanceState previously saved instance data.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
 
 
         mCallApiButton = (Button) findViewById(R.id.get_events);
@@ -106,8 +107,8 @@ public class MainActivity extends Activity
                 mCallApiButton.setEnabled(false);
                 mAddEventsButton.setEnabled(false);
                 addNewEvent();
-               // mOutputText.setText("");
-               // getResultsFromApi();
+                // mOutputText.setText("");
+                // getResultsFromApi();
                 mCallApiButton.setEnabled(true);
                 mAddEventsButton.setEnabled(true);
 
@@ -135,7 +136,7 @@ public class MainActivity extends Activity
         mOutputText = (TextView) findViewById(R.id.mOutputText);
         mOutputText.setMovementMethod(new ScrollingMovementMethod());
         mOutputText.setText(
-                "Click the \'" + BUTTON_TEXT +"\' button to test the API.");
+                "Click the \'" + BUTTON_TEXT + "\' button to test the API.");
 
 
         mProgress = new ProgressDialog(this);
@@ -149,7 +150,6 @@ public class MainActivity extends Activity
     }
 
 
-
     /**
      * Attempt to call the API, after verifying that all the preconditions are
      * satisfied. The preconditions are: Google Play Services installed, an
@@ -158,11 +158,11 @@ public class MainActivity extends Activity
      * appropriate.
      */
     private void getResultsFromApi() {
-        if (! isGooglePlayServicesAvailable()) {
+        if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
-        } else if (! isDeviceOnline()) {
+        } else if (!isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
             try {
@@ -182,7 +182,7 @@ public class MainActivity extends Activity
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {*/
-            new MakeAddEventRequestTask(mCredential).execute();
+        new MakeAddEventRequestTask(mCredential).execute();
         //}
     }
 
@@ -225,17 +225,18 @@ public class MainActivity extends Activity
      * Called when an activity launched here (specifically, AccountPicker
      * and authorization) exits, giving you the requestCode you started it with,
      * the resultCode it returned, and any additional data from it.
+     *
      * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
+     * @param resultCode  code indicating the result of the incoming
+     *                    activity result.
+     * @param data        Intent (containing result data) returned by incoming
+     *                    activity result.
      */
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     mOutputText.setText(
@@ -271,11 +272,12 @@ public class MainActivity extends Activity
 
     /**
      * Respond to requests for permissions at runtime for API 23 and above.
-     * @param requestCode The request code passed in
-     *     requestPermissions(android.app.Activity, String, int, String[])
-     * @param permissions The requested permissions. Never null.
+     *
+     * @param requestCode  The request code passed in
+     *                     requestPermissions(android.app.Activity, String, int, String[])
+     * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
-     *     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
+     *                     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -289,9 +291,10 @@ public class MainActivity extends Activity
     /**
      * Callback for when a permission is granted using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
     public void onPermissionsGranted(int requestCode, List<String> list) {
@@ -301,9 +304,10 @@ public class MainActivity extends Activity
     /**
      * Callback for when a permission is denied using the EasyPermissions
      * library.
+     *
      * @param requestCode The request code associated with the requested
-     *         permission
-     * @param list The requested permission list. Never null.
+     *                    permission
+     * @param list        The requested permission list. Never null.
      */
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
@@ -312,6 +316,7 @@ public class MainActivity extends Activity
 
     /**
      * Checks whether the device currently has a network connection.
+     *
      * @return true if the device has a network connection, false otherwise.
      */
     private boolean isDeviceOnline() {
@@ -323,8 +328,9 @@ public class MainActivity extends Activity
 
     /**
      * Check that Google Play services APK is installed and up to date.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
     private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability apiAvailability =
@@ -352,8 +358,9 @@ public class MainActivity extends Activity
     /**
      * Display an error dialog showing that Google Play Services is missing
      * or out of date.
+     *
      * @param connectionStatusCode code describing the presence (or lack of)
-     *     Google Play Services on this device.
+     *                             Google Play Services on this device.
      */
     void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
@@ -382,32 +389,56 @@ public class MainActivity extends Activity
                     .build();
 
 
-
         }
 
         private void showCalenderList() {
             // Iterate through entries in calendar list
             String pageToken = null;
-                try {
-            do {
-                CalendarList calendarList = null;
+            try {
+                do {
+                    CalendarList calendarList = null;
                     calendarList = mService.calendarList().list().setPageToken(pageToken).execute();
-                List<CalendarListEntry> items = calendarList.getItems();
 
-                for (CalendarListEntry calendarListEntry : items) {
-                    //System.out.println(calendarListEntry.getSummary());
-                    Log.wtf("CalenderList", "showCalenderList: to string "+calendarListEntry.toString() );
-                    Log.wtf("CalenderList", "showCalenderList: id  = = == ="+calendarListEntry.getId() );
-                }
-                pageToken = calendarList.getNextPageToken();
-            } while (pageToken != null);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    List<CalendarListEntry> items = calendarList.getItems();
+
+
+                    // Retrieve access rule
+                     //AclRule rule = mService.acl().get("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com", "reader").execute();
+
+                    //System.out.println(rule.getId() + ":role is " + rule.getRole());
+
+                    //start of adding acl
+                    // Create access rule with associated scope
+                    AclRule rule = new AclRule();
+                    AclRule.Scope scope = new AclRule.Scope();
+                    scope.setType("user").setValue("chnouman200@gmail.com");
+                    rule.setScope(scope).setRole("reader");
+
+                    // Insert new access rule
+                    AclRule createdRule = mService.acl().insert("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com", rule).execute();
+                    System.out.println(createdRule.getId());
+                    System.out.println("acl detail is "+createdRule.toString());
+                    //end of adding acl
+
+                    for (CalendarListEntry calendarListEntry : items) {
+                        //System.out.println(calendarListEntry.getSummary());
+                        Log.wtf("CalenderList", "showCalenderList: to string " + calendarListEntry.toString());
+                        Log.wtf("CalenderList", "showCalenderList: id  = = == =" + calendarListEntry.getId());
+                        Log.wtf("CalenderList", "showCalenderList: id  = = == =" + calendarListEntry.getAccessRole());
+
+
+                    }
+
+                    pageToken = calendarList.getNextPageToken();
+                } while (pageToken != null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         /**
          * Background task to call Google Calendar API.
+         *
          * @param params no parameters needed for this task.
          */
         @Override
@@ -425,23 +456,23 @@ public class MainActivity extends Activity
 
         /**
          * Fetch a list of the next 10 events from the primary calendar.
+         *
          * @return List of Strings describing returned events.
          * @throws IOException
          */
         private List<String> getDataFromApi() throws IOException {
             // List the next 10 events from the primary calendar.
-           //CreateCalendar();
+            //CreateCalendar();
             DateTime now = new DateTime(System.currentTimeMillis());
             //makeCale();
             List<String> eventStrings = new ArrayList<String>();
-            Events events = mService.events().list("primary")
+            Events events = mService.events().list("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com")
                     .setMaxResults(1000)
                     /*.setTimeMin(now)*/
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
                     .execute();
             List<Event> items = events.getItems();
-
             for (Event event : items) {
                 DateTime start = event.getStart().getDateTime();
                 if (start == null) {
@@ -449,49 +480,45 @@ public class MainActivity extends Activity
                     // the start date.
                     start = event.getStart().getDate();
                 }
-                wtf("TAg", "getDataFromApi: "+event.toString() );
-
+                wtf("TAg", "getDataFromApi: " + event.toString());
                 eventStrings.add(
                         String.format("%s (%s)", event.getSummary(), start));
             }
             return eventStrings;
         }
 
-
-        public void makeCale(){
+        public void makeCale() {
             // Create a new calendar list entry
             CalendarListEntry calendarListEntry = new CalendarListEntry();
             /*classroom111041963119631196123@group.calendar.google.com*/
             calendarListEntry.setId("primary");
-
-// Insert the new calendar list entry
+            // Insert the new calendar list entry
             CalendarListEntry createdCalendarListEntry = null;
             try {
                 createdCalendarListEntry = mService.calendarList().insert(calendarListEntry).execute();
-                System.out.println("Valued "+createdCalendarListEntry.toString());
+                System.out.println("Valued " + createdCalendarListEntry.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-        public void CreateCalendar()
-        {
+
+        public void CreateCalendar() {
 
             try {
-        // Create a new calendar
-            com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
-            calendar.setSummary("StarlingCalender");
-            calendar.setTimeZone("America/Los_Angeles");
+                // Create a new calendar
+                com.google.api.services.calendar.model.Calendar calendar = new com.google.api.services.calendar.model.Calendar();
+                calendar.setSummary("StarlingCalender");
+                calendar.setTimeZone("America/Los_Angeles");
 
-        // Insert the new calendar
+                // Insert the new calendar
                 com.google.api.services.calendar.model.Calendar createdCalendar = null;
                 createdCalendar = mService.calendars().insert(calendar).execute();
                 System.out.println(createdCalendar.getId());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
+
         @Override
         protected void onPreExecute() {
             mOutputText.setText("");
@@ -552,6 +579,7 @@ public class MainActivity extends Activity
 
         /**
          * Background task to call Google Calendar API.
+         *
          * @param params no parameters needed for this task.
          */
         @Override
@@ -567,6 +595,7 @@ public class MainActivity extends Activity
 
         /**
          * Fetch a list of the next 10 events from the primary calendar.
+         *
          * @return List of Strings describing returned events.
          * @throws IOException
          */
@@ -576,37 +605,36 @@ public class MainActivity extends Activity
 
             /**starting code for adding event */
 
-            Event event = new Event()
-                    .setSummary("Test Starling")
+            Event event = new Event().setSummary("Event Summer1")
                     .setLocation("office # 26, Rehman Trade Center, Sargodha Pakistan")
                     .setDescription("Starling team is going to organize a Meeting to discuss the Starling Architecture");
-            DateTime startDateTime = new DateTime("2015-05-28T09:00:00-07:00");
+            DateTime startDateTime = new DateTime("2017-05-28T09:00:00-07:00");
             EventDateTime start = new EventDateTime()
                     .setDateTime(startDateTime)
                     .setTimeZone("America/Los_Angeles");
             event.setStart(start);
 
-            DateTime endDateTime = new DateTime("2017-05-28T17:00:00-07:00");
+            DateTime endDateTime = new DateTime("2017-06-28T17:00:00-07:00");
             EventDateTime end = new EventDateTime()
                     .setDateTime(endDateTime)
                     .setTimeZone("America/Los_Angeles");
             event.setEnd(end);
 
-            EventAttendee[] attendees = new EventAttendee[] {
+            EventAttendee[] attendees = new EventAttendee[]{
                     new EventAttendee().setEmail("chnouman200@gmail.com"),
                     new EventAttendee().setEmail("dixeamoffice@gmail.com"),
                     new EventAttendee().setEmail("link2faiz@gmail.com"),
                     new EventAttendee().setEmail("fzn.ullah@gmail.com"),
             };
             event.setAttendees(Arrays.asList(attendees));
-
+/*no6k6ecfj6udglada29neqmt0c@group.calendar.google.com*/
             event = mService.events().insert("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com", event).execute();
 
             wtf("Event created: %s\n", event.getHtmlLink());
 
             /** end of adding event */
 
-               // wtf("TAg", "getDataFromApi: "+event.toString() );
+            // wtf("TAg", "getDataFromApi: "+event.toString() );
 
 
             return event.getHtmlLink();
@@ -622,11 +650,11 @@ public class MainActivity extends Activity
         @Override
         protected void onPostExecute(String output) {
             mProgress.hide();
-            if (output == null ) {
+            if (output == null) {
                 mOutputText.setText("No results returned.");
             } else {
 
-                mOutputText.setText( output+"");
+                mOutputText.setText(output + "");
             }
         }
 
@@ -653,6 +681,4 @@ public class MainActivity extends Activity
     }
 
 
-
-
- }
+}
