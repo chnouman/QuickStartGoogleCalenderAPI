@@ -402,7 +402,7 @@ public class MainActivity extends Activity
                     List<CalendarListEntry> items = calendarList.getItems();
 
 
-                    // Retrieve access rule
+                    // Retrieve access rules
                      //AclRule rule = mService.acl().get("no6k6ecfj6udglada29neqmt0c@group.calendar.google.com", "reader").execute();
 
                     //System.out.println(rule.getId() + ":role is " + rule.getRole());
